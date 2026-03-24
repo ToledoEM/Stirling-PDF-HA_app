@@ -39,6 +39,24 @@ For a lighter install without OCR or Office conversion, see **[Stirling-PDF](../
 | `langs` | `en_GB` | Comma-separated Tesseract OCR language codes, e.g. `en_GB,fra,deu`. |
 | `log_level` | `info` | Log verbosity: `info`, `debug`, `warn`, or `error`. |
 
+### Enabling login and team features
+
+Stirling-PDF includes optional user authentication, team management, and workspace features. To enable them, set `enable_login` to `true` in the add-on configuration and also add the following to your `settings.yml` at `/config/stirling_pdf_full/configs/settings.yml`:
+
+```yaml
+security:
+  enableLogin: true
+```
+
+To additionally unlock user roles, team collaboration, admin controls, and enterprise features, set `DISABLE_ADDITIONAL_FEATURES=false` in the same file:
+
+```yaml
+system:
+  disableAdditionalFeatures: false
+```
+
+See the [Stirling-PDF documentation](https://docs.stirlingpdf.com) for full details on user management.
+
 ## Persistent Storage
 
 Data is stored on your Home Assistant host and survives add-on updates and restarts.
