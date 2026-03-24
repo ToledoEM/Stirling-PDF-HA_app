@@ -1,8 +1,9 @@
-# Stirling-PDF — Home Assistant Add-on
+# Stirling-PDF (Basic) — Home Assistant Add-on
 
-[Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) is a locally hosted web application for performing operations on PDF files. This is the **basic** variant — lightweight, fast to install, covering the most common PDF tasks.
+> **This is the BASIC variant.** No OCR. No LibreOffice. No Ghostscript. Lightweight and fast to install.
+> For the full feature set, use **[Stirling-PDF Full](../stirling_pdf_full/)** instead.
 
-For OCR, LibreOffice conversion, and the full tool set, see **[Stirling-PDF Full](../stirling_pdf_full/)**.
+[Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) is a locally hosted web application for performing operations on PDF files.
 
 ## Features
 
