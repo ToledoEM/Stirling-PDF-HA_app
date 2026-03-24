@@ -35,8 +35,9 @@ PIPELINE_DIR="/share/stirling_pdf_full/pipeline"
 mkdir -p "$CONFIGS_DIR" "$LOGS_DIR" "$TESSDATA_DIR" "$PIPELINE_DIR"
 
 # Symlink HA persistent paths → Stirling-PDF expected paths
+# fat image uses /configs, /logs, /pipeline at root
 for pair in \
-  "${CONFIGS_DIR}:/app/configs" \
+  "${CONFIGS_DIR}:/configs" \
   "${LOGS_DIR}:/logs" \
   "${TESSDATA_DIR}:/usr/share/tesseract-ocr/5/tessdata" \
   "${PIPELINE_DIR}:/pipeline"
@@ -66,13 +67,21 @@ log "  tessdata=${TESSDATA_DIR}"
 log "  logs=${LOGS_DIR}"
 log "  pipeline=${PIPELINE_DIR}"
 
-if [[ -f /app/app.jar ]]; then
+# fat image: /app.jar at root; standard image: /app/app.jar with lib dir
+if [[ -f /app.jar ]]; then
+  log "Starting Stirling-PDF Full via /app.jar"
+  exec java \
+    -Dfile.encoding=UTF-8 \
+    -Djava.io.tmpdir=/tmp/stirling-pdf \
+    -jar /app.jar
+elif [[ -f /app/app.jar ]]; then
   log "Starting Stirling-PDF Full via /app/app.jar"
   cd /app
   exec java \
     -Dfile.encoding=UTF-8 \
+    -Djava.io.tmpdir=/tmp/stirling-pdf \
     -cp "/app/app.jar:/app/lib/*" \
     stirling.software.SPDF.SPDFApplication
 fi
 
-die "Could not find Stirling-PDF jar at /app/app.jar. Check the build."
+die "Could not find Stirling-PDF jar. Check the build."
