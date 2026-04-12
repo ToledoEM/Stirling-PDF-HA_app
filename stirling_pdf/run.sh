@@ -74,8 +74,7 @@ if [[ -f /app/app.jar ]]; then
   cd /app
   exec java \
     -Dfile.encoding=UTF-8 \
-    -cp "/app/app.jar:/app/lib/*" \
-    stirling.software.SPDF.SPDFApplication
+    -jar /app/app.jar
 fi
 
 die "Could not find Stirling-PDF jar at /app/app.jar. Check the build."

@@ -80,8 +80,7 @@ elif [[ -f /app/app.jar ]]; then
   exec java \
     -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp/stirling-pdf \
-    -cp "/app/app.jar:/app/lib/*" \
-    stirling.software.SPDF.SPDFApplication
+    -jar /app/app.jar
 fi
 
 die "Could not find Stirling-PDF jar. Check the build."
