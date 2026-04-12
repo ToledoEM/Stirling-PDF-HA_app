@@ -10,10 +10,13 @@ RUN apk add --no-cache \
       coreutils \
       jq \
       openssl \
-      ca-certificates \
-      openjdk21-jre-headless
+      ca-certificates
 
-# Copy the Stirling-PDF application and its runtime assets from upstream image
+# Copy the Stirling-PDF application, JDK, and runtime assets from upstream image
+COPY --from=stirling /opt/java/openjdk /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
 COPY --from=stirling /app /app
 COPY --from=stirling /scripts /scripts
 COPY --from=stirling /configs /configs
