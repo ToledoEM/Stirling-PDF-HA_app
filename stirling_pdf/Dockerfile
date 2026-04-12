@@ -13,9 +13,10 @@ RUN apk add --no-cache \
       ca-certificates \
       curl
 
-# Install Temurin JDK 25 (matches upstream image) for the correct arch
+# Install Zulu JDK 25 musl build (glibc Temurin won't run on Alpine/musl)
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
+ARG ZULU_VERSION=zulu25.32.17-ca-jdk25.0.2
 # hadolint ignore=DL4006
 RUN ARCH="$(uname -m)" \
     && case "$ARCH" in \
@@ -23,7 +24,7 @@ RUN ARCH="$(uname -m)" \
          aarch64) JDK_ARCH="aarch64" ;; \
          *) echo "Unsupported arch: $ARCH"; exit 1 ;; \
        esac \
-    && curl -fsSL "https://api.adoptium.net/v3/binary/latest/25/ga/linux/${JDK_ARCH}/jdk/hotspot/normal/eclipse?project=jdk" \
+    && curl -fsSL "https://cdn.azul.com/zulu/bin/${ZULU_VERSION}-linux_musl_${JDK_ARCH}.tar.gz" \
        -o /tmp/jdk.tar.gz \
     && mkdir -p "$JAVA_HOME" \
     && tar -xzf /tmp/jdk.tar.gz -C "$JAVA_HOME" --strip-components=1 \
