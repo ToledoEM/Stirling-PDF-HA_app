@@ -10,12 +10,25 @@ RUN apk add --no-cache \
       coreutils \
       jq \
       openssl \
-      ca-certificates
+      ca-certificates \
+      curl
 
-# Copy the Stirling-PDF application, JDK, and runtime assets from upstream image
-COPY --from=stirling /opt/java/openjdk /opt/java/openjdk
+# Install Temurin JDK 25 (matches upstream image) for the correct arch
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
+# hadolint ignore=DL4006
+RUN ARCH="$(uname -m)" \
+    && case "$ARCH" in \
+         x86_64)  JDK_ARCH="x64" ;; \
+         aarch64) JDK_ARCH="aarch64" ;; \
+         *) echo "Unsupported arch: $ARCH"; exit 1 ;; \
+       esac \
+    && curl -fsSL "https://api.adoptium.net/v3/binary/latest/25/ga/linux/${JDK_ARCH}/jdk/hotspot/normal/eclipse?project=jdk" \
+       -o /tmp/jdk.tar.gz \
+    && mkdir -p "$JAVA_HOME" \
+    && tar -xzf /tmp/jdk.tar.gz -C "$JAVA_HOME" --strip-components=1 \
+    && rm /tmp/jdk.tar.gz \
+    && apk del curl
 
 COPY --from=stirling /app /app
 COPY --from=stirling /scripts /scripts
