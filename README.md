@@ -6,7 +6,7 @@ A Home Assistant OS add-on repository that packages [Stirling-PDF](https://githu
 
 ### Stirling-PDF (basic)
 
-Lightweight install (~600 MB). Covers the most common PDF tasks with no external tool dependencies.
+Lightweight install (~600 MB). Covers the most common PDF tasks with no external tool dependencies. **Requires 2 GB RAM minimum.**
 
 **Included:** merge, split, compress, rotate, watermark, sign, annotate, redact, image↔PDF conversion, pipeline automation, REST API.
 
@@ -18,7 +18,7 @@ Lightweight install (~600 MB). Covers the most common PDF tasks with no external
 
 ### Stirling-PDF Full
 
-Full-featured install (~4 GB). Uses the `latest-fat` upstream image and includes every external tool Stirling-PDF supports.
+Full-featured install (~4 GB). Uses the `latest-fat` upstream image and includes every external tool Stirling-PDF supports. **Requires 4 GB RAM minimum.**
 
 **Adds over basic:** OCR (Tesseract), PDF↔Word/PowerPoint/RTF/XML (LibreOffice), compress/repair (Ghostscript + qpdf), ImageMagick compression, HTML/URL/Markdown→PDF (Weasyprint), PDF→HTML/Markdown (pdftohtml).
 
