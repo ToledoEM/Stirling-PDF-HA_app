@@ -1,7 +1,7 @@
 # hadolint ignore=DL3007
-FROM stirlingtools/stirling-pdf:latest
+FROM stirlingtools/stirling-pdf:latest-fat
 
-# Install s6-overlay and bashio (HA supervisor tooling)
+# Install s6-overlay and bashio (the HA supervisor tooling)
 ARG S6_OVERLAY_VERSION=3.2.0.2
 # hadolint ignore=DL3008
 RUN apt-get update \
@@ -25,15 +25,14 @@ RUN apt-get update \
        | tar -C /usr/lib/bashio --strip-components=2 -xz bashio-main/lib \
     && ln -sf /usr/lib/bashio/bashio /usr/bin/bashio \
     && printf '#!/usr/bin/env bash\n. /usr/lib/bashio/bashio.sh\nexec "$@"\n' > /usr/bin/with-contenv \
-    && chmod +x /usr/bin/with-contenv \
-    && apt-get purge -y --auto-remove curl xz-utils
+    && chmod +x /usr/bin/with-contenv
 
 COPY run.sh /run.sh
 COPY rootfs /
 
 RUN chmod +x /run.sh \
-    && chmod +x /etc/s6-overlay/s6-rc.d/stirling_pdf/run \
-    && chmod +x /etc/s6-overlay/s6-rc.d/stirling_pdf/finish
+    && chmod +x /etc/s6-overlay/s6-rc.d/stirling_pdf_fat/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/stirling_pdf_fat/finish
 
 ARG BUILD_VERSION
 LABEL \

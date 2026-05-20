@@ -10,4 +10,4 @@ configuration:
     description: Verbosity of add-on and application logging.
 
 network:
-  8080/tcp: Stirling-PDF Web UI
+  8080/tcp: Stirling-PDF Full Web UI

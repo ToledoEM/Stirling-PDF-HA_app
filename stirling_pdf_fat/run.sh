@@ -7,11 +7,11 @@ DEFAULT_LANGS="en_GB"
 DEFAULT_LOG_LEVEL="info"
 
 log() {
-  echo "[stirling-pdf-full-addon] $*"
+  echo "[stirling-pdf-fat-addon] $*"
 }
 
 die() {
-  echo "[stirling-pdf-full-addon] ERROR: $*" >&2
+  echo "[stirling-pdf-fat-addon] ERROR: $*" >&2
   exit 1
 }
 
@@ -27,15 +27,15 @@ LANGS="$(read_opt langs)";               LANGS="${LANGS:-$DEFAULT_LANGS}"
 LOG_LEVEL="$(read_opt log_level)";       LOG_LEVEL="${LOG_LEVEL:-$DEFAULT_LOG_LEVEL}"
 
 # Persistent directories on HA mapped volumes
-CONFIGS_DIR="/config/stirling_pdf_full/configs"
-LOGS_DIR="/config/stirling_pdf_full/logs"
-TESSDATA_DIR="/share/stirling_pdf_full/tessdata"
-PIPELINE_DIR="/share/stirling_pdf_full/pipeline"
+CONFIGS_DIR="/config/stirling_pdf_fat/configs"
+LOGS_DIR="/config/stirling_pdf_fat/logs"
+TESSDATA_DIR="/share/stirling_pdf_fat/tessdata"
+PIPELINE_DIR="/share/stirling_pdf_fat/pipeline"
 
 mkdir -p "$CONFIGS_DIR" "$LOGS_DIR" "$TESSDATA_DIR" "$PIPELINE_DIR"
 
 # Symlink HA persistent paths → Stirling-PDF expected paths
-# (only if not already linked to a persistent location)
+# fat image uses /configs, /logs, /pipeline at root
 for pair in \
   "${CONFIGS_DIR}:/configs" \
   "${LOGS_DIR}:/logs" \
@@ -47,7 +47,6 @@ do
   if [[ -L "$dst" ]]; then
     rm "$dst"
   elif [[ -d "$dst" ]]; then
-    # Seed with any existing default files, then replace with symlink
     cp -rn "$dst/." "$src/" 2>/dev/null || true
     rm -rf "$dst"
   fi
@@ -58,7 +57,6 @@ export SECURITY_ENABLELOGIN="$ENABLE_LOGIN"
 export LANGS
 export MODE="BOTH"
 export LOGGING_LEVEL="$LOG_LEVEL"
-export HOME="${HOME:-/root}"
 
 # Cap JVM heap — upstream dynamic calc uses 70% of host RAM which OOMs on HA.
 # JAVA_BASE_OPTS is read by /scripts/init-without-ocr.sh before building JAVA_TOOL_OPTIONS.
@@ -67,10 +65,10 @@ export HOME="${HOME:-/root}"
 _total_mb=$(awk '/MemTotal/ { printf "%d", $2/1024 }' /proc/meminfo)
 _xmx_mb=$(( _total_mb * 40 / 100 ))
 _meta_mb=$(( _total_mb * 15 / 100 ))
-[[ $_xmx_mb -lt 256 ]]  && _xmx_mb=256
-[[ $_meta_mb -lt 128 ]] && _meta_mb=128
+[[ $_xmx_mb -lt 512 ]]  && _xmx_mb=512
+[[ $_meta_mb -lt 192 ]] && _meta_mb=192
 log "Detected ${_total_mb}MB RAM → JVM Xmx=${_xmx_mb}m MaxMetaspace=${_meta_mb}m"
-export JAVA_BASE_OPTS="-XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:+UseStringDeduplication -Dspring.threads.virtual.enabled=true -Xms128m -Xmx${_xmx_mb}m -XX:MaxMetaspaceSize=${_meta_mb}m"
+export JAVA_BASE_OPTS="-XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:+UseStringDeduplication -Dspring.threads.virtual.enabled=true -Xms256m -Xmx${_xmx_mb}m -XX:MaxMetaspaceSize=${_meta_mb}m"
 
 log "Configuration summary:"
 log "  enable_login=${ENABLE_LOGIN}"
@@ -87,6 +85,6 @@ pkill -f "soffice"   2>/dev/null || true
 sleep 1
 
 # Delegate to upstream init script which handles java startup correctly
-log "Starting Stirling-PDF Full via /scripts/init.sh"
+log "Starting Stirling-PDF Fat via /scripts/init.sh"
 cd /app
 exec /scripts/init.sh
